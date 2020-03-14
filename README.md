@@ -3,4 +3,4 @@
 ### Team:
 * Anton Krylov
 * Vyacheslav Vasilev
-* Valeria Vertash
+* Valeriya Vertash
