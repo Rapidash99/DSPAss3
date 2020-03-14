@@ -33,31 +33,32 @@ for name = list("drums", "speech", "violin", "voice", "Violin_Viola_Cello_Bass")
     f = my_filter(name, "convol")
 end
 
-function out = my_iir(x, n, D, a, b)
-    D=[0,D(1:size(D, 'c')-1)]
-    D(1)=x(n) - a(1)*D(2) - a(2)*D(3)
-    out = b(1)*D(1) + b(2)*D(2) + b(3)*D(3)
+function [out, d_out] = my_iir(x, n, D, a, b)
+    d_out=[0,D(1:size(D, 'c')-1)]
+    d_out(1)=x(n) - a(1)*d_out(2) - a(2)*d_out(3)
+    out = b(1)*d_out(1) + b(2)*d_out(2) + b(3)*d_out(3)
 endfunction
 
 function output = supafiltar(y, a, b)
     D = zeros(1, 3)
     output = zeros(1, size(y, 'c'))
-    
     for n=1:size(y, 'c')
-        output(n) = my_iir(y, n, D, a, b)
+        [out, d_out] = my_iir(y, n, D, a, b)
+        D = d_out
+        output(n) = out
     end
 endfunction
 
-drums = loadwave("data/drums.wav")
+violin = loadwave("data/Violin_Viola_Cello_Bass.wav")
 
 //lowpass
-a = [-1.9733442497812987, 0.9736948719763]
-b = [0.00008765554875401547, 0.00017531109750803094, 0.00008765554875401547] 
+a =  [-1.9733442497812987, 0.9736948719763]
+b =  [0.00008765554875401547, 0.00017531109750803094, 0.00008765554875401547]
 
-savewave("data_out/drums_lowpass_out.wav", supafiltar(drums, a, b), 44100)
+savewave("data_out/Violin_Viola_Cello_Bass_out.wav", supafiltar(violin, a, b), 44100)
 
 //highpass
 a =  [-0.3769782747249014, -0.19680764477614976]
 b =  [0.40495734254626874, -0.8099146850925375, 0.4049573425462687]
 
-savewave("data_out/drums_highpass_out.wav", supafiltar(drums, a, b), 44100)
+savewave("data_out/Violin_Viola_Cello_Bass_highpass_out.wav", supafiltar(violin, a, b), 44100);
