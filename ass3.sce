@@ -8,9 +8,20 @@ function f = my_filter(name, method)
     time = toc()
     
     mprintf('filtering with %s by %s: %f seconds\n', name, method, time)
+    f = trim_zeros(f)
 //    playsnd(f)
 //    sleep(5000)
     savewave("data_out/" + name + " filtered by " + method + ".wav", f, 44100)
+endfunction
+
+function reduced = trim_zeros(filtered)
+    for i = size(filtered, "c"):-10:1
+        if abs(filtered(1, i)) > 0.00000001 then
+            reduced = resize_matrix(filtered, -1, i)
+            return
+        end
+    end
+    reduced = filtered
 endfunction
 
 IRC = loadwave('data/IRC.wav')
@@ -18,6 +29,9 @@ IRC_size = size(IRC, "c")
 if (size(IRC) > 1) then
     IRC = IRC(1, :)
 end
+
+//reducing amplitude by half
+IRC = IRC .* 0.5
 
 for name = list("drums", "speech", "violin", "voice", "Violin_Viola_Cello_Bass")
     record = loadwave("data/" + name + ".wav")
@@ -62,3 +76,18 @@ a =  [-0.3769782747249014, -0.19680764477614976]
 b =  [0.40495734254626874, -0.8099146850925375, 0.4049573425462687]
 
 savewave("data_out/Violin_Viola_Cello_Bass_highpass_out.wav", supafiltar(violin, a, b), 44100);
+
+s = loadwave("data_out/violin_lowpass_out.wav")
+f = figure(1)
+subplot(2, 2, 1)
+plot(s, "-r");
+e = loadwave("data/proc_low.wav")
+subplot(2, 2, 2)
+plot(e, "-g");
+s = loadwave("data_out/violin_highpass_out.wav")
+f = figure(1)
+subplot(2, 2, 3)
+plot(s, "-r");
+e = loadwave("data/proc_high.wav")
+subplot(2, 2, 4)
+plot(e, "-g");
